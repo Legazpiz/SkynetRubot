@@ -28,6 +28,10 @@ try {
         $tg->send
             ->text($str)
             ->send();
+    }else if($tg->text_has("Guerra")){
+        $tg->send
+            ->notification(FALSE)
+            ->file('audio', "files/audio/hipo.ogg");
     }else if($tg->text_regex("My name's {name}")){
      $tg->send
         ->text("Nice to meet you, " .$tg->input->name ."!")
@@ -66,6 +70,75 @@ try {
     }elseif($tg->callback == "but4"){
     $tg->answer_if_callback("You pressed the fourth button!", TRUE);
     // Display an alert and stop loading button.
+    }elseif(
+        $tg->text_has(["montar", "monta", "crear", "organizar", "organiza", "nueva"], ["quedada"]) and
+        $tg->words() <= 20
+    ){
+        //TODO Organizar quedadas
+        /*$place = NULL;
+        if($tg->text_has("en")){
+            $pos = strpos($tg->text(), " en ") + strlen(" en ");
+            $place = substr($tg->text(), $pos);
+            if(!$tg->text_has(["termina", "acaba"], ["a las"])){
+                $place = preg_replace("/ a las \d\d[:.]\d\d$/", "", $place);
+            }
+        }
+        if(empty($place) and $tg->words() > 5){ return; }
+
+        $poke = pokemon_parse($tg->text());
+        $time = time_parse($tg->text());*/
+
+        $str = "Nueva #quedada";
+
+
+        /*if(!empty($time) and isset($time['hour'])){
+            $str .= " a las " .$time['hour'];
+        }
+
+        if(!empty($place)){
+            $str .= " en $place";
+        }
+
+        $str .= "!\n";*/
+
+        /* Desactivado por canal y gente que crea y no va.
+        $user = $pokemon->user($tg->user->id);
+        $team = ['R' => 'red', 'B' => 'blue', 'Y' => 'yellow'];
+        $str .= "- " . $tg->emoji(":heart-" .$team[$user->team] .":") ." L" .$user->lvl ." @" .$user->username ."\n";
+        */
+
+        $tg->send
+            ->text($str)
+            ->inline_keyboard()
+                ->row()
+                    ->button("¡Me apunto!", "QuedadaApuntar")
+                    ->button("¡Ya estoy!", "QuedadaEstoy")
+                ->end_row()
+                ->row()
+                    ->button("Reflotar", "QuedadaReflotar")
+                ->end_row()
+            ->show()
+        ->send();
+
+        $tg->send->delete(TRUE);
+
+        //return -1;
+    }elseif($tg->callback == "QuedadaReflotar"){
+        $tg->answer_if_callback("");
+        //if(!in_array($telegram->user->id, telegram_admins(TRUE))){ return -1; }
+
+        $tg->send
+            ->text($tg->text_message())
+            ->inline_keyboard()
+                ->row()
+                    ->button("¡Me apunto!", "QuedadaApuntar")
+                    ->button("¡Ya estoy!", "QuedadaEstoy")
+                ->end_row()
+                ->row()
+                    ->button("Reflotar", "QuedadaReflotar")
+                ->end_row()
+            ->show()
+        ->send();
     }
 
 } catch (\Zelenin\Telegram\Bot\NotOkException $e) {
