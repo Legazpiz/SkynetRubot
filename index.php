@@ -28,6 +28,10 @@ try {
         $tg->send
             ->text($str)
             ->send();
+    }else if($tg->text_has(["Amarillos", "Amarillo", "amarillos", "amarillo"])){
+        $tg->send
+            ->notification(FALSE)
+            ->file('photo', "files/img/amarillos.jpg");
     }else if($tg->text_has("Guerra")){
         $tg->send
             ->notification(FALSE)
@@ -121,6 +125,83 @@ try {
         ->send();
 
         $tg->send->delete(TRUE);
+
+        //return -1;
+    }elseif($tg->callback == "QuedadaApuntar"){
+        $str = $tg->text_message();
+        $user = $tg->user->username;
+
+        $str = explode("\n", $str);
+        $str[1] = ""; // RESERVED
+        $found = FALSE;
+
+        foreach($str as $k => $s){
+            if(strpos($s, $user) !== FALSE){
+                $found = TRUE;
+                unset($str[$k]);
+            }
+        }
+
+        // Agregar
+        if(!$found){
+            $str[] = $tg->emoji(":ok:") . $user;
+        }
+
+        $str[1] = "Hay " .(count($str) - 2) ." personas apuntadas:";
+
+        $str = implode("\n", $str);
+
+        $tg->answer_if_callback();
+        $tg->send
+            ->chat(TRUE)
+            ->message(TRUE)
+            ->text($str)
+            ->inline_keyboard()
+                ->row()
+                    ->button("¡Me apunto!", "QuedadaApuntar")
+                    ->button("¡Ya estoy!", "QuedadaEstoy")
+                ->end_row()
+                ->row()
+                    ->button("Reflotar", "QuedadaReflotar")
+                ->end_row()
+            ->show()
+        ->edit('text');
+
+        //return -1;
+    }elseif($tg->callback == "QuedadaEstoy"){
+        $str = $tg->text_message();
+        $user = $tg->user->username;
+
+        if(strpos($str, $user) !== FALSE){
+            // $tg->answer_if_callback("¡Ya estás apuntado en la lista!", TRUE);
+            // return -1;
+            $str = explode("\n", $str);
+            foreach($str as $k => $s){
+                if(strpos($s, $user) !== FALSE){
+                    if(strpos($s, $tg->emoji(":ok:")) !== FALSE){
+                        $str[$k] = $tg->emoji(":check:") . $user;
+                    }else{
+                        $str[$k] = $tg->emoji(":ok:") . $user;
+                    }
+                }
+            }
+            $str = implode("\n", $str);
+        }
+        $tg->answer_if_callback();
+        $tg->send
+            ->chat(TRUE)
+            ->message(TRUE)
+            ->text($str)
+            ->inline_keyboard()
+                ->row()
+                    ->button("¡Me apunto!", "QuedadaApuntar")
+                    ->button("¡Ya estoy!", "QuedadaEstoy")
+                ->end_row()
+                ->row()
+                    ->button("Reflotar", "QuedadaReflotar")
+                ->end_row()
+            ->show()
+        ->edit('text');
 
         //return -1;
     }elseif($tg->callback == "QuedadaReflotar"){
