@@ -19,7 +19,7 @@ try {
 
     if($tg->text_has("Yes")){
         $tg->send
-            ->text("Yes!")
+            ->text($tg->get_admins())
             ->send();
     }else if($tg->text_regex("I'm {N:age}") and $tg->words() <= 4){
         $num = $tg->input->age;
@@ -32,6 +32,11 @@ try {
         $tg->send
             ->notification(FALSE)
             ->file('photo', "files/img/amarillos.jpg");
+    }else if($tg->text_has(["muestra", "pasa", "dime"], ["normas", "las normas"]) and in_array($tg->user->id, $tg->get_admins())){
+        $str = "¿Qué os parecen las normas?\n¿Tenéis alguna idea para mejorarlas?\n Entrad aquí y comentadnos" . $tg->emoji(":muscle:") . "\n" . "https://docs.google.com/forms/d/e/1FAIpQLSdzaoc44-msZ1EW3aD56T65wNhsO7Ed4WDCwwYZB83T1WMs5g/viewform?usp=sf_link";
+        $tg->send
+            ->text($str)
+            ->send();
     }else if($tg->text_has("Guerra")){
         $tg->send
             ->notification(FALSE)
@@ -42,7 +47,7 @@ try {
         ->send();
     }elseif($tg->text_has("Buttons") and $tg->words() <= 5){
     $tg->send
-        ->text("Here you have some buttons, you choose.")
+        ->text("Here you have some buttons, your choice is?")
         ->inline_keyboard()
             ->row()
                 ->button("B1", "but1")
@@ -141,7 +146,7 @@ try {
             }
         }
 
-        // Agregar
+        // Apuntarse
         if(!$found){
             $str[] = $tg->emoji(":ok:") . $user;
         }
