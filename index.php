@@ -32,6 +32,14 @@ try {
         $tg->send
             ->notification(FALSE)
             ->file('photo', "files/img/amarillos.jpg");
+    }elseif($tg->text_has(["buenos", "buenas"], ["días", "día", "tarde", "tarda", "tardes", "noches", "nit"]) or $tg->text_has(["egunon", "gabon"])){
+        $str = "Buenas, " . $tg->user->username . "! " . $tg->emoji(":raised_hands:");
+        if($tg->text_has(["noches", "gabon"])){
+            $str = "Buenas noches " . $tg->user->username . "! " . $tg->emoji(":hand:");
+        }
+        $tg->send
+            ->text($str)
+            ->send();
     }else if($tg->text_has(["muestra", "pasa", "dime"], ["normas", "las normas"]) and in_array($tg->user->id, $tg->get_admins())){
         $str = "¿Qué os parecen las normas?\n¿Tenéis alguna idea para mejorarlas?\n Entrad aquí y comentadnos" . $tg->emoji(":muscle:") . "\n" . "https://docs.google.com/forms/d/e/1FAIpQLSdzaoc44-msZ1EW3aD56T65wNhsO7Ed4WDCwwYZB83T1WMs5g/viewform?usp=sf_link";
         $tg->send
