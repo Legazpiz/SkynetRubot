@@ -28,7 +28,7 @@ try {
         $tg->send
             ->text($str)
             ->send();
-    }else if($tg->text_has(["Amarillos", "Amarillo", "amarillos", "amarillo"])){
+    }else if($tg->text_has(["amarillos", "amarillo"])){
         $tg->send
             ->notification(FALSE)
             ->file('photo', "files/img/amarillos.jpg");
@@ -75,43 +75,34 @@ try {
     $tg->answer_if_callback("You pressed the fourth button!", TRUE);
     // Display an alert and stop loading button.
     }elseif(
-        $tg->text_has(["montar", "monta", "crear", "organizar", "organiza", "nueva"], ["quedada"]) and
+        $tg->text_has(["montar", "monta", "crear", "crea", "organizar", "organiza", "nueva"], ["quedada"]) and
         $tg->words() <= 20
     ){
         //TODO Organizar quedadas
-        /*$place = NULL;
-        if($tg->text_has("en")){
+        $reason = NULL;
+        $place = NULL;
+        /*if($tg->text_has("en")){
             $pos = strpos($tg->text(), " en ") + strlen(" en ");
             $place = substr($tg->text(), $pos);
             if(!$tg->text_has(["termina", "acaba"], ["a las"])){
                 $place = preg_replace("/ a las \d\d[:.]\d\d$/", "", $place);
             }
-        }
-        if(empty($place) and $tg->words() > 5){ return; }
+        }*/
 
-        $poke = pokemon_parse($tg->text());
-        $time = time_parse($tg->text());*/
+        if($tg->text_has("para") and $tg->text_has("en") and $tg->text_has("a las")){
+            $pos = strpos($tg->text(), " para ") + strlen(" para ");
+            $reason = substr($tg->text(), $pos);
+            //$time = time_parse($tg->text());
 
-        $str = "Nueva #quedada";
+            $str = "Mira, una nueva #quedada";
 
+            if(!empty($reason)){
+                $str .= " para " . $reason;
+            }
 
-        /*if(!empty($time) and isset($time['hour'])){
-            $str .= " a las " .$time['hour'];
-        }
+            //$str .= "!\n"; 
 
-        if(!empty($place)){
-            $str .= " en $place";
-        }
-
-        $str .= "!\n";*/
-
-        /* Desactivado por canal y gente que crea y no va.
-        $user = $pokemon->user($tg->user->id);
-        $team = ['R' => 'red', 'B' => 'blue', 'Y' => 'yellow'];
-        $str .= "- " . $tg->emoji(":heart-" .$team[$user->team] .":") ." L" .$user->lvl ." @" .$user->username ."\n";
-        */
-
-        $tg->send
+            $tg->send
             ->text($str)
             ->inline_keyboard()
                 ->row()
@@ -127,6 +118,14 @@ try {
         $tg->send->delete(TRUE);
 
         //return -1;
+        }else{
+            $str = $tg->emoji(":exclamation:") . "Humano, cometiste un error" . $tg->emoji(":exclamation:") . $tg->emoji(":robot:") . "\nRepite el comando de la siguiente forma:\nCrear quedada para <b>tal motivo</b> en <b>tal lugar</b> a las <b>hh:mm</b>";
+            $tg->send
+            ->text($str)
+            ->send();
+        }
+        //if(empty($place) and $tg->words() > 5){ return;
+        
     }elseif($tg->callback == "QuedadaApuntar"){
         $str = $tg->text_message();
         $user = $tg->user->username;
@@ -227,4 +226,165 @@ try {
     //echo error message ot log it
     //echo $e->getMessage();
 
+}
+
+//function definitions, we gotta tide this up...
+function time_parse($string){
+    $string = strtolower($string);
+    $string = str_replace(["á","é"], ["a","e"], $string);
+    $string = str_replace(["?", "¿", "!"], "", $string);
+    $s = explode(" ", $string);
+    $data = array();
+    $number = NULL;
+    // ---------
+    $days = [
+        'lunes' => 'monday', 'martes' => 'tuesday',
+        'miercoles' => 'wednesday', 'jueves' => 'thursday',
+        'viernes' => 'friday', 'sabado' => 'saturday',
+        'domingo' => 'sunday'
+    ];
+    $months = [
+        'enero' => 'january', 'febrero' => 'february', 'marzo' => 'march',
+        'abril' => 'april', 'mayo' => 'may', 'junio' => 'june',
+        'julio' => 'july', 'agosto' => 'august', 'septiembre' => 'september',
+        'octubre' => 'october', 'noviembre' => 'november', 'diciembre' => 'december'
+    ];
+    $waiting_month = FALSE;
+    $waiting_time = FALSE;
+    $waiting_time_add = FALSE;
+    $select_week = FALSE;
+    $next_week = FALSE;
+    $last_week = FALSE;
+    $this_week_day = FALSE;
+    foreach($s as $w){
+        if($w == "de" && (!isset($data['date']) or empty($data['date']) )){ $waiting_month = TRUE; } // FIXME not working?
+        if(!isset($data['hour']) and in_array($w, ["la", "las"])){ $waiting_time = TRUE; }
+        if(!isset($data['hour']) and $w == "en"){ $waiting_time_add = TRUE; }
+
+        if(is_int($w) or (in_array(strlen($w), [2,3]) && substr($w, -1) == "h")){
+            $number = (int) abs($w);
+            if($waiting_time){
+                if($number >= 24){ continue; }
+                if($number <= 6){ $number = $number + 12; }
+                $data['hour'] = $number .":00";
+                $waiting_time = FALSE;
+            }
+            continue;
+        }
+
+        if(!isset($data['hour']) && preg_match("/(\d\d?)[:.](\d\d)/", $w, $hour)){
+            if($hour[1] >= 24){ $hour[1] = "00"; }
+            if($hour[2] >= 60){ $hour[2] = "00"; }
+            $data['hour'] = "$hour[1]:$hour[2]";
+            continue;
+        }
+
+        if($waiting_time && in_array($w, ['noche']) && !isset($data['hour'])){
+            $data['hour'] = "22:00";
+            $waiting_time = FALSE;
+            continue;
+        }
+        if($waiting_time && in_array($w, ['tarde']) && !isset($data['hour'])){
+            $data['hour'] = "18:00";
+            $waiting_time = FALSE;
+            continue;
+        }
+        if($waiting_time && in_array($w, ['mañana', 'maana', 'manana']) && !isset($data['hour'])){
+            $data['hour'] = "11:00";
+            $waiting_time = FALSE;
+            continue;
+        }
+        if($waiting_time_add && in_array($w, ['hora', 'horas']) && !isset($data['hour'])){
+            $hour = date("H") + $number;
+            if(date("i") >= 30){ $hour++; } // Si son más de y media, suma una hora.
+            $data['hour'] = $hour .":00";
+            if(!isset($data['date'])){ $data['date'] = date("Y-m-d"); } // HACK bien?
+            $waiting_time_add = FALSE;
+            continue;
+        }
+        if(in_array($w, array_keys($days)) && ($next_week or $last_week or $this_week_day) && !isset($data['date'])){
+            $selector = "+1 week next";
+            if($this_week_day && date("w") <= date("w", strtotime($days[$w]))){ $selector = "this"; }
+            if($this_week_day && date("w") > date("w", strtotime($days[$w]))){ $selector = "next"; }
+            if($last_week){ $selector = "last"; } // && date("w") > date("w", strtotime($days[$w]))
+            if($next_week && date("w") >= date("w", strtotime($days[$w]))){ $selector = "next"; }
+            $data['date'] = date("Y-m-d", strtotime($selector ." " .$days[$w]));
+            $next_week = FALSE;
+            $last_week = FALSE;
+            $this_week_day = FALSE;
+            continue;
+        }
+        if(in_array($w, array_keys($months))){ // FIXME $waiting_month no funciona
+            if($number >= 1 && $number <= 31){
+                $data['date'] = date("Y-m-d", strtotime($months[$w] ." " .$number));
+            }
+            $waiting_month = FALSE;
+            continue;
+        }
+        if($w == "semana" && !isset($data['date'])){
+            if($next_week){
+                $data['date'] = date("Y-m-d", strtotime("next week"));
+                $next_week = FALSE;
+                continue;
+            }
+            $select_week = TRUE;
+            continue;
+        }
+        if(in_array($w, ["proximo", "próximo", "proxima", "próxima", "siguiente"])){
+            // proximo lunes != ESTE lunes, esta semana
+            if($select_week && !isset($data['date'])){
+                $data['date'] = date("Y-m-d", strtotime("next week"));
+                $select_week = FALSE;
+                continue;
+            }
+            $next_week = TRUE;
+            continue;
+        }
+        if(in_array($w, ["pasado", "pasada"])){
+            if(!isset($data['date']) or empty($data['date'])){
+                if($this_week_day){ $this_week_day = FALSE; }
+                if($select_week){
+                    // last week = LUNES, marca el dia de hoy!
+                    $en_days = array_values($days);
+                    $data['date'] = date("Y-m-d", strtotime("last week " .$en_days[date("N") - 1]));
+                    $select_week = FALSE;
+                    continue;
+                }
+                $last_week = TRUE;
+                continue;
+            }
+            // el pasado martes, el martes pasado.
+            $tmp = new DateTime($data['date']);
+            $tmp->modify('-1 week');
+            $data['date'] = $tmp->format('Y-m-d');
+            continue;
+        }
+        if(in_array($w, ["este", "el"])){
+            // este lunes
+            $this_week_day = TRUE;
+            continue;
+        }
+        if(in_array($w, ['mañana', 'maana', 'manana']) && !isset($data['date'])){
+            // Distinguir mañana de "por la mañana"
+            $data['date'] = date("Y-m-d", strtotime("tomorrow"));
+            continue;
+        }
+        if($w == "hoy" && !isset($data['date'])){
+            $data['date'] = date("Y-m-d"); // TODAY
+            continue;
+        }
+        if($w == "ayer" && !isset($data['date'])){
+            $data['date'] = date("Y-m-d", strtotime("yesterday"));
+            continue;
+        }
+    }
+
+    if(isset($data['date'])){
+        $strdate = $data['date'] ." " .(isset($data['hour']) ? $data['hour'] : "00:00");
+        $strdate = strtotime($strdate);
+        $data['left_hours'] = floor(($strdate - time()) / 3600);
+        $data['left_minutes'] = floor(($strdate - time()) / 60);
+    }
+
+    return $data;
 }
