@@ -1,12 +1,11 @@
 <?php
 
 /*
-* This file is part of GeeksWeb Bot (GWB).
 *
 * Author(s):
 *
-* © 2017 Rubén Torre
-*
+* 2017 Rubén Torre
+* XXXX More to come
 */
 
 include 'src/Autoloader.php';
@@ -40,8 +39,8 @@ try {
         $tg->send
             ->text($str)
             ->send();
-    }else if($tg->text_has(["muestra", "pasa", "dime"], ["normas", "las normas"]) and in_array($tg->user->id, $tg->get_admins())){
-        $str = "¿Qué os parecen las normas?\n¿Tenéis alguna idea para mejorarlas?\n Entrad aquí y comentadnos" . $tg->emoji(":muscle:") . "\n" . "https://docs.google.com/forms/d/e/1FAIpQLSdzaoc44-msZ1EW3aD56T65wNhsO7Ed4WDCwwYZB83T1WMs5g/viewform?usp=sf_link";
+    }else if($tg->text_has(["skynet", "muestra", "pasa", "dime", "lista"], ["normas", "las normas"]) and in_array($tg->user->id, $tg->get_admins())){
+        $str = "¿Qué os parecen las normas?\n¿Tenéis alguna idea para mejorarlas?\n Entrad aquí y comentadnos para que les demos una vuelta" . $tg->emoji(":muscle:") . "\n" . "https://docs.google.com/forms/d/e/1FAIpQLSdzaoc44-msZ1EW3aD56T65wNhsO7Ed4WDCwwYZB83T1WMs5g/viewform?usp=sf_link";
         $tg->send
             ->text($str)
             ->send();
@@ -88,7 +87,7 @@ try {
     $tg->answer_if_callback("You pressed the fourth button!", TRUE);
     // Display an alert and stop loading button.
     }elseif(
-        $tg->text_has(["montar", "monta", "crear", "crea", "organizar", "organiza", "nueva"], ["quedada"]) and
+        $tg->text_has(["montar", "monta", "crear", "crea", "organizar", "organiza", "nueva"], ["quedada", "pokedada"]) and
         $tg->words() <= 20
     ){
         //TODO Organizar quedadas
@@ -107,7 +106,7 @@ try {
             $reason = substr($tg->text(), $pos);
             //$time = time_parse($tg->text());
 
-            $str = "Mira, una nueva #quedada";
+            $str = "Mira, una nueva #pokedada";
 
             if(!empty($reason)){
                 $str .= " para " . $reason;
@@ -132,7 +131,7 @@ try {
 
         //return -1;
         }else{
-            $str = $tg->emoji(":exclamation:") . "Humano, cometiste un error" . $tg->emoji(":exclamation:") . $tg->emoji(":robot:") . "\nRepite el comando de la siguiente forma:\nCrear quedada para <b>tal motivo</b> en <b>tal lugar</b> a las <b>hh:mm</b>";
+            $str = $tg->emoji(":exclamation:") . "Humano, cometiste un error" . $tg->emoji(":exclamation:") . $tg->emoji(":robot:") . "\nRepite el comando de la siguiente forma:\nCrear pokedada para <b>tal motivo</b> en <b>tal lugar</b> a las <b>hh:mm</b>";
             $tg->send
             ->text($str)
             ->send();
@@ -232,6 +231,14 @@ try {
                 ->end_row()
             ->show()
         ->send();
+    }else if($tg->text_has(["skynet", "avisar", "un"], ["dragón", "dragon", "dratini", "dragonair", "dragonite"])){
+        $tg->send
+            ->notification(FALSE)
+            ->file('video', "files/video/dragon.mp4");
+    }else if($tg->text_has("skynet") and $tg->words() > 4){
+        $tg->send
+            ->text($tg->user->username . ", me temo que aún no tengo respuesta para eso" . $tg->emoji(":robot:"))
+            ->send();
     }
 
 } catch (\Zelenin\Telegram\Bot\NotOkException $e) {
