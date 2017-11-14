@@ -31,7 +31,7 @@ try {
         $tg->send
             ->notification(FALSE)
             ->file('photo', "files/img/amarillos.jpg");
-    }elseif($tg->text_has(["buenos", "buenas"], ["días", "día", "tarde", "tarda", "tardes", "noches", "nit"]) or $tg->text_has(["egunon", "gabon"])){
+    }elseif($tg->text_has(["buenos", "buenas", "hola", "kaixo"], ["skynet", "días", "día", "tarde", "tarda", "tardes", "noches", "nit"]) or $tg->text_has(["egunon", "gabon"])){
         $str = "Buenas human..., esteee... " . $tg->user->username . "! " . $tg->emoji(":robot:") . $tg->emoji(":raised_hands:");
         if($tg->text_has(["noches", "gabon"])){
             $str = "Buenas noches human..., esteee... " . $tg->user->username . "! " . $tg->emoji(":robot:") . $tg->emoji(":hand:");
