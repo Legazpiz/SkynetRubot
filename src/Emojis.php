@@ -464,6 +464,7 @@
 ':soccer:' => "\u{26bd}",
 ':baseball:' => "\u{26be}",
 ':tennis:' => "\u{1f3be}",
+':table_tennis:' => "\u{1f3d3}",
 ':8ball:' => "\u{1f3b1}",
 ':rugby_football:' => "\u{1f3c9}",
 ':bowling:' => "\u{1f3b3}",

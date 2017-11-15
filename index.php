@@ -16,9 +16,9 @@ $tg  = new Telegram\Receiver($bot);
 //The app
 try {
 
-    if($tg->text_has("Yes")){
+    if($tg->text_has("ping")){
         $tg->send
-            ->text($tg->get_admins())
+            ->text("Pong!" . $tg->emoji(":table_tennis:"))
             ->send();
     }else if($tg->text_regex("I'm {N:age}") and $tg->words() <= 4){
         $num = $tg->input->age;
@@ -31,7 +31,11 @@ try {
         $tg->send
             ->notification(FALSE)
             ->file('photo', "files/img/amarillos.jpg");
-    }elseif($tg->text_has(["buenos", "buenas", "hola", "kaixo"], ["skynet", "días", "día", "tarde", "tarda", "tardes", "noches", "nit"]) or $tg->text_has(["egunon", "gabon"])){
+    }else if($tg->text_has(["rojos", "rojo"])){
+        $tg->send
+            ->notification(FALSE)
+            ->file('video', "files/video/rojos.mp4");
+    }else if($tg->text_has(["buenos", "buenas", "hola", "kaixo"], ["skynet", "días", "día", "tarde", "tarda", "tardes", "noches", "nit"]) or $tg->text_has(["egunon", "egunones", "gabon"])){
         $str = "Buenas human..., esteee... " . $tg->user->username . "! " . $tg->emoji(":robot:") . $tg->emoji(":raised_hands:");
         if($tg->text_has(["noches", "gabon"])){
             $str = "Buenas noches human..., esteee... " . $tg->user->username . "! " . $tg->emoji(":robot:") . $tg->emoji(":hand:");
@@ -52,7 +56,7 @@ try {
      $tg->send
         ->text("Nice to meet you, " .$tg->input->name ."!")
         ->send();
-    }elseif($tg->text_has("Buttons") and $tg->words() <= 5){
+    }else if($tg->text_has("Buttons") and $tg->words() <= 5){
     $tg->send
         ->text("Here you have some buttons, your choice is?")
         ->inline_keyboard()
@@ -66,28 +70,28 @@ try {
             ->end_row()
         ->show()
     ->send();
-    }elseif($tg->callback == "but1"){
+    }else if($tg->callback == "but1"){
     $tg->answer_if_callback(""); // Stop loading button.
     $tg->send
         ->message(TRUE)
         ->chat(TRUE)
         ->text("You pressed the first button!")
         ->edit("text");
-    }elseif($tg->callback == "but2"){
+    }else if($tg->callback == "but2"){
     $tg->answer_if_callback("You pressed the second button!", TRUE);
     // Display an alert and stop loading button.
-    }elseif($tg->callback == "but3"){
+    }else if($tg->callback == "but3"){
     $tg->answer_if_callback(""); // Stop loading button.
     $tg->send
         ->message(TRUE)
         ->chat(TRUE)
         ->text("You pressed the third button!")
         ->edit("text");
-    }elseif($tg->callback == "but4"){
+    }else if($tg->callback == "but4"){
     $tg->answer_if_callback("You pressed the fourth button!", TRUE);
     // Display an alert and stop loading button.
-    }elseif(
-        $tg->text_has(["montar", "monta", "crear", "crea", "organizar", "organiza", "nueva"], ["quedada", "pokedada"]) and
+    }else if(
+        $tg->text_has(["montar", "monta", "crear", "crea", "organizar", "organiza", "nueva"], ["quedada", "pokequedada"]) and
         $tg->words() <= 20
     ){
         //TODO Organizar quedadas
@@ -106,7 +110,7 @@ try {
             $reason = substr($tg->text(), $pos);
             //$time = time_parse($tg->text());
 
-            $str = "Mira, una nueva #pokedada";
+            $str = "Mira, una nueva #pokequedada";
 
             if(!empty($reason)){
                 $str .= " para " . $reason;
@@ -131,14 +135,14 @@ try {
 
         //return -1;
         }else{
-            $str = $tg->emoji(":exclamation:") . "Humano, cometiste un error" . $tg->emoji(":exclamation:") . $tg->emoji(":robot:") . "\nRepite el comando de la siguiente forma:\nCrear pokedada para <b>tal motivo</b> en <b>tal lugar</b> a las <b>hh:mm</b>";
+            $str = $tg->emoji(":exclamation:") . "Humano, cometiste un error" . $tg->emoji(":exclamation:") . $tg->emoji(":robot:") . "\nRepite el comando de la siguiente forma:\nCrear pokequedada para <b>tal motivo</b> en <b>tal lugar</b> a las <b>hh:mm</b>";
             $tg->send
             ->text($str)
             ->send();
         }
         //if(empty($place) and $tg->words() > 5){ return;
         
-    }elseif($tg->callback == "QuedadaApuntar"){
+    }else if($tg->callback == "QuedadaApuntar"){
         $str = $tg->text_message();
         $user = $tg->user->username;
 
@@ -179,7 +183,7 @@ try {
         ->edit('text');
 
         //return -1;
-    }elseif($tg->callback == "QuedadaEstoy"){
+    }else if($tg->callback == "QuedadaEstoy"){
         $str = $tg->text_message();
         $user = $tg->user->username;
 
@@ -215,7 +219,7 @@ try {
         ->edit('text');
 
         //return -1;
-    }elseif($tg->callback == "QuedadaReflotar"){
+    }else if($tg->callback == "QuedadaReflotar"){
         $tg->answer_if_callback("");
         //if(!in_array($telegram->user->id, telegram_admins(TRUE))){ return -1; }
 
@@ -235,7 +239,12 @@ try {
         $tg->send
             ->notification(FALSE)
             ->file('video', "files/video/dragon.mp4");
-    }else if($tg->text_has("skynet") and $tg->words() > 4){
+    }/*else if($tg->text_has(["skynet"], ["sabes", "puedes"]) and $tg->words() > 2){ 
+        //$str = file_get_contents('files/txt/dos.txt', true);
+        $tg->send
+            ->text("De momento puedo: ")
+            ->send();
+    }*/else if($tg->text_has("skynet") and $tg->words() > 6){
         $tg->send
             ->text($tg->user->username . ", me temo que aún no tengo respuesta para eso" . $tg->emoji(":robot:"))
             ->send();
