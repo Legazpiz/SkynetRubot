@@ -27,10 +27,14 @@ try {
         $tg->send
             ->text($str)
             ->send();
+    }else if($tg->text_has(["azules", "azul"])){
+        $tg->send
+            ->notification(FALSE)
+            ->file('video', "files/video/azules1.mp4");
     }else if($tg->text_has(["amarillos", "amarillo"])){
         $tg->send
             ->notification(FALSE)
-            ->file('photo', "files/img/amarillos.jpg");
+            ->file('photo', "files/img/amarillos1.jpg");
     }else if($tg->text_has(["rojos", "rojo"])){
         $tg->send
             ->notification(FALSE)
@@ -239,12 +243,12 @@ try {
         $tg->send
             ->notification(FALSE)
             ->file('video', "files/video/dragon.mp4");
-    }/*else if($tg->text_has(["skynet"], ["sabes", "puedes"]) and $tg->words() > 2){ 
-        //$str = file_get_contents('files/txt/dos.txt', true);
+    }else if($tg->text_has(["skynet"], ["sabes", "puedes"]) and $tg->text_contains("?")){ 
+        $str = file_get_contents('files/txt/dos.txt', true);
         $tg->send
-            ->text("De momento puedo: ")
+            ->text($tg->emoji(":robot:") . "<b>Por el momento puedo:</b>\n" . $str)
             ->send();
-    }*/else if($tg->text_has("skynet") and $tg->words() > 6){
+    }else if($tg->text_has("skynet") and $tg->words() > 4){
         $tg->send
             ->text($tg->user->username . ", me temo que aún no tengo respuesta para eso" . $tg->emoji(":robot:"))
             ->send();
